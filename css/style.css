@@ -7,11 +7,13 @@ a:hover	{color:#225799; text-decoration:none;}
 
 /*structural elements*/
 #container	{margin:0px auto; text-align:center; width:760px; }
+#papercontainer	{margin:0px auto; text-align:center; width:760px; }
 #holder		{width:100%; padding:20px 20px 5px 20px; background:#FFFFFF; text-align:left; }
-#logo		{background:url('../images/logo.gif') no-repeat 180px 0; border-bottom:1px solid #DADADA; padding:5px 30px 20px 0px; }
+#logo		{background:url('../images/logo.gif') no-repeat 180px 0; border-bottom:1px solid #000000; padding:5px 30px 20px 0px; }
 #navigation	{padding:10px 0; }
 #header		{background:#DADADA url('../images/header_home.jpg') no-repeat 10px 10px; padding:10px; height:261; }
 #content	{float:left; width:490px; padding:20px 10px 0 0; line-height:160%; }
+#papercontent	{background:#FFFFFF; text-align:left; width:760px; padding:20px; line-height:120%; }
 #news		{float:right; width:250px; padding:20px 0; line-height:140%; text-align:justify; }
 .newsItem	{padding:20px 20px 5px 20px; background:#FEFFD5; border:1px solid #FFEB70; font-size:90%; margin-bottom:20px; }
 #footer		{clear:both; width:100%; font-size:80%; background:#DADADA; padding:20px; text-align:left; border-top:2px solid #2765AF; }
