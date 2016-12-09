@@ -1,30 +1,228 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-
+<HTML>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><title>YoctoWorks</title>
 
 <link rel="stylesheet" type="text/css" href="css/style.css" />
-<meta name="Author" content="Thomas E. Besemer" /></head><body>
+
 <div id="container">
-	<div id="papercontent">
-		<h1>Yocto Hybrid SDK Architecture</h1>
-		<p>Insert cool stuff</p>
+        <div id="papercontent">
+
+<H1 CLASS="western">Introduction</H1>
+<P>This paper outlines a hybrid Yocto based build environment
+architecture that provides the following features:</P>
+<UL>
+	<LI><P>Utilization of the Yocto/Poky build environment for managing
+	the Root Filesystem, Linux Kernel, U-Boot and proprietary target
+	drivers.</P>
+	<LI><P>Utilization of the Yocto SDK to build developer specific
+	Application Code without the need for extensive <FONT FACE="Courier New, monospace">bitbake</FONT>
+	recipe development.</P>
+	<LI><P>Provides a clear separation of Operating System environment
+	from Application Code.</P>
+	<LI><P>Provides a simple yet robust means to track upstream feeds
+	from the community to keep current with Open Source packages.  For
+	example, security updates in OpenSSL often need to be incorporated
+	into a final product on a regular basis.</P>
+</UL>
+<P>Figure 1 serves as an example of a hybrid SDK based architecture
+that promotes an easily managed development environment.</P>
 <p><img style="width: 760px; height: 511px;" alt="Missing" src="images/yocto_sdk_block.jpg" /><br />
 </p>
-
-		<p>Enjoy the Site!</p>
-	</div>
-	<div id="footer">
-		<ul>
-			<li><a href="#">Home</a></li>
-			<li><a href="#">About Us</a></li>
-			<li><a href="#">Technology Solutions</a></li>
-			<li><a href="#">Portfolio</a></li>
-			<li><a href="#">Strategic Partners</a></li>
-			<li><a href="#">Contact</a></li>
-			<li><a href="#">Jobs</a></li>
-		</ul>
-	</div>
+<P ALIGN=CENTER><B>Figure 1 &#8210; Yocto Hybrid SDK Based Architecture</B></P>
+<P></P>
+<P>Yocto, OpenEmbedded and all associated recipes and meta layers
+provide a robust environment for building Root Filesystems, and
+managing Open Source Packages.  The recipes associated with this are
+well maintained by a large community, and often require little
+change.  Thus, Yocto serves well as a package building engine, but it
+is not an IDE designed for day to day software development.  In
+summary, Yocto serves well to pull Open Source Packages, build, and
+then deploy them into a viable Operating System environment.</P>
+<P>User Application Code, however, is often much easier to maintain
+when built with a standard <FONT FACE="Courier New, monospace">Makefile</FONT>
+based build environment.  It allows straight-forward builds in
+component directories without <FONT FACE="Courier New, monospace">bitbake</FONT>
+recipes and working within Yocto.  To facilitate this approach, it's
+necessary for the User Application Code to have access to the Open
+Source libraries and header files, as well as have a “cross
+compile” tool chain to use for builds.    The Yocto SDK serves will
+to provide these services and infrastructure.</P>
+<H1 CLASS="western">Hybrid Architecture Foundations</H1>
+<P>Utilization of Open Source and associated build engines frees the
+developer from having to invest time and resources into maintaining
+an Operating System baseline; this is done by the community. 
+Associated with this is the need to easily be able to pull and
+integrate in the never ending set of changes and evolution of all of
+these “upstream packages.”   To help achieve an ability to easily
+keep current with the community, it's important to maintain a clean
+separation between the Operating System environment, and the User
+Application Code.  A good analogy to consider in a design approach
+would be an Ubuntu based system; its an Operating System, and is
+easily maintained and kept current.  But, developers would write
+application code that ran under Ubuntu.  They would not make changes
+to Ubuntu, but rather, have a set of locally designed and built
+packages that ran under Ubuntu.</P>
+<P>The architecture in this paper promotes this approach.  Yocto is
+used to build the Operating System.  From that, a set of
+cross-compile tools exists to develop the User Application Code.  In
+the end, the User Application Code is installed into the Operating
+System Environment.  The foundational points of this are as follows:</P>
+<OL>
+	<LI><P>Work with unmodified Yocto, OpenEmbedded and Vendor released
+	meta-layers.  Often, what the SoC vendor releases is a meta-layer
+	that installs into a stock Yocto release, and builds an image that
+	can be installed on vendor supplied evaluation hardware/target(s).</P>
+	<LI><P>Perform company specific updates to the stock, unmodified
+	releases to allow the basic image to boot on the company specific
+	hardware.  This most often best done through a company specific
+	meta-layer that installs into the Yocto build environment.  This
+	meta-layer appends changes to the original, unmodified upstream
+	feeds.</P>
+	<LI><P>Deploy a Yocto generated SDK onto the host development
+	environment.  This SDK contains libraries, header files and any host
+	specific build tools.  It's an environment that allows cross-compile
+	and build.</P>
+	<LI><P>Develop all User Application Code using the SDK tools, with
+	standard <FONT FACE="Courier New, monospace">Makefile</FONT> based
+	development.</P>
+	<LI><P>Provide scripting to assemble the final image. This takes the
+	stock image out of Yocto that boots stand-alone on the target, and
+	installs the User Application Code into it.  This also promotes
+	building upgrade schemes which are modular by nature.</P>
+</OL>
+<P>With an approach like this, the “build environment” becomes
+host agnostic; it could run on Ubuntu, CentOS or Fedora.  A more
+practical company approach would simply be picking a base like Ubuntu
+14.04 LTS as the supported build environment.  But, the key is to
+avoid reliance on the host build machine; just like we separate the
+ties out between the Operating System, and User Application Code, we
+all separate out any ties to the host build environment.  An example
+of this would be Python; use the SDK provided Python for any
+scripting in the build environment, versus relying on specific needs
+on the host build machine.</P>
+<H2 CLASS="western">Operating System Infrastructure</H2>
+<P>The Operating System Infrastructure is comprised of the following
+components:</P>
+<UL>
+	<LI><P>A version of U-Boot that boots on the company specific
+	hardware.</P>
+	<LI><P>A version of the Linux Kernel that boots on company specific
+	hardware.</P>
+	<LI><P>A Root Filesystem that contains few or no modifications from
+	a stock Yocto build, allowing the system to boot into a login
+	prompt.</P>
+</UL>
+<P>To achieve this, the following steps:</P>
+<OL>
+	<LI><P>Work with the stock Yocto, vendor and other meta-layers,
+	without modification.</P>
+	<LI><P>Make any changes to U-Boot and the Kernel for the company
+	specific hardware.  This is best done with a company specific
+	meta-layer which applies patch sets to U-boot and the Kernel without
+	modification of the original upstream sources.  For example, instead
+	of modifying any meta-layer recipe, simply use the <FONT FACE="Courier New, monospace">bbappend</FONT>
+	capability of OpenEmbedded to perform localized changes.</P>
+	<LI><P>This company specific meta-layer would provide needed drivers
+	for FPGA's and other proprietary hardware.</P>
+	<LI><P>Work with package groups in Yocto as need be.  For example,
+	start with <FONT FACE="Courier New, monospace">core-image-minimal</FONT>,
+	and beef that up to incorporate all other Open Source packages
+	needed for the product.  Typically, this would be creating a custom
+	Distro in a company specific meta-layer, as well as a company
+	specific package group set in the company meta-layer.</P>
+</OL>
+<P>Through this approach, at any given time, we have the result of an
+image and Root Filesystem that can boot stand-alone, without
+application code.  Multiple long-term capability can be realized
+through this approach:</P>
+<UL>
+	<LI><P>Taking updates from the Community, such as new versions of
+	OpenSSL, are easily done, as no changes were made on original
+	source.</P>
+	<LI><P>Taking vendor updates are easily accomplished, as not changes
+	were done to original source.</P>
+	<LI><P>Unit Test Cases are easily developed to qualify the Operating
+	System environment.</P>
+</UL>
+<P>It should also be noted that with an approach like this, U-Boot
+can TFTP load the Linux Kernel, and the Linux Kernel and NFS mount
+the Root Filesystem.  Once stable, U-Boot requires few changes, it
+simply needs to have basic driver support for media and network.  On
+a day to day development effort, there is no need to “re-flash” a
+target; simply boot everything over the network.</P>
+<H2 CLASS="western">Yocto SDK Utilization</H2>
+<P>Yocto has inherent capability to generate an SDK.  This SDK
+contains the following:</P>
+<OL>
+	<LI><P>Cross-compile tools, as well as any host tools that are
+	required for part of the User Application Code build.</P>
+	<LI><P>It exports Header Files and Libraries required for the build.</P>
+	<LI><P>When properly done, provides an environment that has no ties
+	to the underlying host build machine.</P>
+</OL>
+<P>If properly deployed, and coupled with a company specific Distro,
+it provides a clean cross-compile environment that allows for
+controlled releases of new tools.  An environment is sourced for
+builds, and User Application Code simply builds with the environment.</P>
+<H2 CLASS="western">User Application Code</H2>
+<P>Through the approaches outlined in the previous sections, the User
+Application Code simply becomes a set of executable applications
+which have been compiled against the libraries and header files from
+Yocto.  These  executable applications can be installed one by one,
+or as a group, on the the target.  They are build without <FONT FACE="Courier New, monospace">bitbake</FONT>
+recipes, and in such, are not tied heavily to the Yocto
+infrastructure.</P>
+<P>This facilitates a  clean upgrade scheme; without heavy ties to
+the Operating System Environment, upgrades can be done in several
+means:</P>
+<UL>
+	<LI><P>Full upgrade, OS infrastructure and application.</P>
+	<LI><P>Application only upgrade.</P>
+</UL>
+<P>But the real power is in day to day development.  Stable targets
+with stable Operating Systems environments only require update of the
+specific application code components.</P>
+<P>More so, the User Application Code is built with a standard
+<FONT FACE="Courier New, monospace">Makefile</FONT> based
+environment, avoiding the need for extensive <FONT FACE="Courier New, monospace">bitbake</FONT>
+recipe development.</P>
+<H2 CLASS="western">A Practical Deployment Approach</H2>
+<P>Although past the scope of this paper, the key elements to
+consider are:</P>
+<UL>
+	<LI><P>Establish original source and upstream feeds in <FONT FACE="Courier New, monospace">github</FONT>,
+	allowing tracking of changes and updates from the community.</P>
+	<LI><P>Establish a company specific meta-layer to performed needed
+	changes to unmodified releases from the community.  This meta-layer
+	would also be responsible for building proprietary drivers.</P>
+	<LI><P>Separate Application Code from Operation System code, thus
+	promoting a clean, multi-year approach to maintaining source.</P>
+</UL>
+<P>And then, utilize a boot-strap scheme to build:</P>
+<OL>
+	<LI><P>Within <FONT FACE="Courier New, monospace">github</FONT>,
+	have the core build infrastructure.  This is a single point of pull.
+	 Within that pull is a master <FONT FACE="Courier New, monospace">Makefile</FONT>.</P>
+	<LI><P>This core <FONT FACE="Courier New, monospace">Makefile</FONT>
+	then executes to pull in the upstream, put it all into place, and
+	execute the complete build.</P>
+</OL>
+<P>This approach leads well to any continuous integration and build
+scheme.</P>
 </div>
-</body></html>
+        <div id="footer">
+                <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Technology Solutions</a></li>
+                        <li><a href="#">Portfolio</a></li>
+                        <li><a href="#">Strategic Partners</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Jobs</a></li>
+                </ul>
+        </div>
+</div>
+</head>
+</HTML>
