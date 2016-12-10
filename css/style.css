@@ -17,6 +17,7 @@ a:hover	{color:#225799; text-decoration:none;}
 #news		{float:right; width:250px; padding:20px 0; line-height:140%; text-align:justify; }
 .newsItem	{padding:20px 20px 5px 20px; background:#FEFFD5; border:1px solid #FFEB70; font-size:90%; margin-bottom:20px; }
 #footer		{clear:both; width:100%; font-size:80%; background:#DADADA; padding:20px; text-align:left; border-top:2px solid #2765AF; }
+#header_navigation		{clear:both; width:100%; font-size:120%; background:#DADADA; padding:20px; text-align:left; border-bottom:2px solid #2765AF; }
 #copyright	{float:right; }
 
 
@@ -37,6 +38,10 @@ a:hover	{color:#225799; text-decoration:none;}
 #footer a		{color:#000000; font-weight:bold; padding:0 5px 0 0; text-decoration:underline; }
 #footer a:hover	{color:#000000; text-decoration:none; }
 
+#header_navigation ul 		{margin:0; padding:0; }
+#header_navigation li 		{margin:0; padding:0; list-style:none; display:inline; text-decoration:none; }
+#header_navigation a		{color:#000000; font-weight:bold; padding:0 5px 0 0; text-decoration:none;}
+#header_navigation a:hover	{color:#000000; text-decoration:underline; }
 
 /*shamelessly borrowed styles from http://www.positioniseverything.net/easyclearing.html*/
 .clearfix:after {content:"."; display:block; height:0; clear:both; visibility:hidden; }
