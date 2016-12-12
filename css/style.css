@@ -30,8 +30,8 @@ a:hover	{color:#225799; text-decoration:none;}
 /*navigation*/
 #navigation ul 		{margin:0; padding:0; }
 #navigation li 		{margin:0; padding:0; list-style:none; display:inline; }
-#navigation a		{color#000000; padding:0 20px 0 0; text-decoration:none; }
-#navigation a:hover	{color:#000000; }
+#navigation a		{color#000000; padding:0 20px 0 0; text-decoration:none; text-decoration:underline}
+#navigation a:hover	{color:#000000; text-decoration:none;}
 
 #footer ul 		{margin:0; padding:0; }
 #footer li 		{margin:0; padding:0; list-style:none; display:inline; }
