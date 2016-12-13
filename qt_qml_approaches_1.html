@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><title>YoctoWorks</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<meta name="Author" content="Thomas E. Besemer"></head><body>
+<div id="container">
+	<div id="header_navigation">
+		<ul>
+			<li><a href="index.html">Home</a></li>
+			<li><a href="yocto_base.html">Yocto</a></li>
+			<li><a href="buildroot_base.html">BuildRoot</a></li>
+			<li><a href="qt_base.html">QT/QML</a></li>
+			<li><a href="about.html">About</a></li>
+		</ul>
+	</div>
+	<div id="papercontent">
+<H1>Embedded Approaches with QT/QML</H1>
+<P>Developers of GUI based systems, using QT, are faced with
+consistent challenges:</P>
+<UL>
+	<LI>The ability to develop a GUI independent of the underlying
+	application code.
+	<LI>The ability to develop underlying application code without a
+	functional GUI.
+	<LI>The ability to do both simultaneously while actual production
+	hardware is being developed, which often leads to working on
+	evaluation hardware that may not be full-featured.
+</UL>
+<P>This paper focuses on some approaches to help the developers
+approach the implementation strategy in a way that allows clean
+development, debug and deployment of complex products.  The concepts
+outlined in this paper provide the following:</P>
+<UL>
+	<LI>Simplistic ways to develop the GUI in a target hardware
+	agnostic fashion.
+	<LI>Simplistic ways to simulate the target runtime code through
+	Python scripting; Python scripting serves as a simulator for the
+	GUI, allowing easy interaction and updates, as well as GUI
+	regression testing.
+	<LI>Simplistic ways to <I>drive</I> the target runtime code
+	through Python scripting; Python scripting serves as a means to do
+	operational testing, as well as controlled regression testing.
+</UL>
+<H2>Python as a Development Tool</H2>
+<P>Although most people will not deploy a product that is completely
+Python based, Python serves as a excellent choice for easing the
+development cycle for the following reasons:</P>
+<UL>
+	<LI>It's extremely fast to develop in.
+	<LI>Developers with either none or limited Python experience are
+	easily able to grasp the approaches and use the language; it is a
+	very friendly language to work with.
+	<LI>It is host independent; Python can run on x86/Windows
+	environments, x86/Linux environments or target ARM/Linux
+	environments without any changes.
+</UL>
+<P>In summary, it's ease of use, and the abundance of online
+documentation make it an excellent choice as a development tool, as
+scripting is rapidly prototyped, tested and deployed, and it's core
+is string based operations, making it easy to interact with.</P>
+<H2>QT and QML</H2>
+<P>Although QT has been around for  many years, and there are many
+product GUI's developed around it, QML is a relatively new player in
+recent years.  The advantages of a mixed-mode GUI development
+environment are the following:</P>
+<UL>
+	<LI>QT is C++ based, and although runs reasonably well on both
+	Windows and Linux targets, there are some minor quirks on OS layer
+	interfaces, such as how to spawn child processes.  Conditional
+	compilation takes care of this, allowing a GUI to run under both
+	Windows and Linux.
+	<LI>QML is completely target agnostic; it's a scripting language,
+	and it runs inter-operable in both Windows and Linux based
+	environments without change.
+</UL>
+<P>If QML is adopted as the primary language for development of the
+GUI, then the underlying QT, C++ based logic, simply serves as a
+foundation for the QML.  Core services in QT/C++ can be developed
+that operate under Windows or Linux, and then stable, rarely requires
+change, while the bulk of the GUI development efforts lay in QML.</P>
+<H1>A Practical Implementation Strategy</H1>
+<P>Figure 1 serves as a foundation for discussion of a practical
+implementation strategy.</P>
+<P><IMG SRC="images/qt_qml_approaches_1.gif"<BR><BR>
+<P><B>Figure 1 &#8210; A Practical Implementation Architecture</B></P>
+<H2>GUI Core</H2>
+<P>The GUI Core is designed to operate under both Windows and Linux. 
+It's foundational design is rooted around socket level communications
+with some connected server.  Thus, it is a “client” in a
+Client/Server model, and operates stateless.  There are really two
+modes of development under QT:</P>
+<UL>
+	<LI>Signals and Slots, in a C++ environment.
+	<LI>QML, and QML Objects by name.
+</UL>
+<P>In either case, the point is to abstract these away from binding
+with underlying core application services.  However, the preferred
+approach is QML, with Objects by name, versus the traditional Single
+and Slots model.</P>
+<P>In the architecture showing in Figure 1, we have two main
+components, with three key sub-components:</P>
+<UL>
+	<LI>QML Pages.  These provide the actual GUI presentation, as
+	well as a series of objects to interact with.
+	<LI>The QT/C++ component foundation, which contains three
+	sub-components:
+	<UL>
+	<LI><B>Page Manager:</B> Mainly focused on startup, and launching
+	the parent QML Page.
+	<LI><B>QML Object Manager: </B>Mainly focused on dealing with
+	Objects, by name, in the QML sub-system.
+	<LI><B>Session Manager:</B> This provides interaction outside of
+	the GUI with the underlying application, as well as application
+	simulator.  In this discussion, we focus on this being a component
+	that interacts with outside components via Socket level
+	communications, with String/Object Name based interactions.
+	</UL>
+</UL>
+<H3>QML Object Manager</H3>
+<P>A C++ set of methods responsible for
+providing a “bridge” between QML and the connected Server that
+provides functional, state-full services.  Listing 1 shows a simple
+button that requests a “load” of some data:</P>
+<P STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><FONT SIZE=1 STYLE="font-size: 8pt">
+<pre><code>
+    ExmplButton1 {
+        buttonText: "Load" 
+        id: exmpl_button_Load 
+        x: 550 
+        y: 530 
+        MouseArea { 
+            anchors.fill: parent 
+            hoverEnabled: true 
+            acceptedButtons: Qt.LeftButton | Qt.RightButton 
+            onClicked: { 
+                info.text = 'Clicked (wasHeld=' + mouse.wasHeld + ')' 
+                var exmplString = "get exmplButton" 
+                exmpl.updateField( exmplString ) 
+            } 
+        }
+</code></pre>
+</FONT></FONT>
+<P><B>Listing 1 &#8210; Simple Button to Query</B></P>
+<P>This example has two characteristics:</P>
+<UL>
+	<LI>The
+	Object Name is <FONT FACE="Courier New, monospace">exmpl_button_load,</FONT>
+	by ID.
+	<LI>The
+	query to the underlying C++ method in QT is done through
+	<FONT FACE="Courier New, monospace">exmpl.updateField() </FONT>once
+	the button is clicked on.  This passes down the string “<FONT FACE="Courier New, monospace">get
+	exmplButton</FONT>”.  This string is serviced by the Object
+	Manager, which, in the end, passes the entire string, intact, to
+	some handler via a Socket level connection by the Session Manager.
+	<LI>The
+	handler then services this request, and returns a response via the
+	Session Manager, which then does a reverse lookup by name to find
+	the original Object, and then properly handles. Listing 2 shows a
+	simple interaction to find the original Object.
+</UL>
+<P STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><FONT SIZE=1 STYLE="font-size: 8pt">
+<pre>><code>
+    ExmplButton1 { 
+        QObject *qmlTextBox = dataPagesObject->findChild<QObject*>(objectId);   
+        if( qmlTextBox ) { 
+            qDebug() << "ExmplGui::sessionProcessReadData(): Object Found";
+            qDebug() << "Setting Text";
+                qmlTextBox->setProperty( "text", QVariant( objectVal ) );
+        }
+    }
+</code></pre>
+</FONT></FONT>
+<P><B>Listing 2 &#8210; Back Binding to QML by ID</B></P>
+<P>Although
+specific details are omitted from these listings, there are two key
+points:</P>
+<OL>
+	<LI>Strings
+	passed down from QML contain an Object ID encoded in them.  In this
+	case, it is “<FONT FACE="Courier New, monospace">exmplButton</FONT>”.
+	<LI>Strings
+	returned by underlying services contain that Object ID encoded in
+	them, thus allowing a reverse lookup from the QT C++ services to
+	find the original Object ID, and make changes to the attribute based
+	on specific request.  In this case, the underlying, remote connected
+	server understood from the passed string to have QT C++ services
+	lookup by name “<FONT FACE="Courier New, monospace">exmpl_button_load</FONT>”.
+	 Specifically, the QT C++ looked up the QML Object, by ID, through
+	f<FONT FACE="Courier New, monospace">findChild(objectId)</FONT>.
+</OL>
+<H3>Example String/Object ID Bindings</H3>
+<P>On
+some sort of query from QML to the underlying application code, and
+takes the form of:</P>
+<P STYLE="margin-left: 0.49in; text-decoration: none"><FONT FACE="Courier New, monospace"><FONT SIZE=1 STYLE="font-size: 8pt">get
+objectId=[optional parameters]</FONT></FONT></P>
+<P>On some sort of “set”, which causes action to happen from the
+underlying application code, the string takes the form of:</P>
+<P STYLE="margin-left: 0.49in; text-decoration: none"><FONT FACE="Courier New, monospace"><FONT SIZE=1 STYLE="font-size: 8pt">set
+objectId=[parameters, comma separated, which are parsed by underlying
+application code]</FONT></FONT></P>
+<P>Return strings adhere to the rules, providing easy back binding to original
+request.  The result of this is:</P>
+<UL>
+	<LI>An
+	API that is string based, thus allowing the underlying application
+	code to be interacted with via Telnet and socket based
+	communications.  It imposes constraints, based on Object ID's, which
+	lead to consistency in approach and development.
+	<LI>Through
+	the defined API, which is string based, and interactions done over a
+	socket, two things happen:
+	<UL>
+	<LI>A
+	stateless GUI can be developed; it sends strings, responds to
+	strings
+	<LI>A
+	state-full application is developed, which acts on string input
+	(commands), and emits string based results.
+	</UL>
+</UL>
+<P>The GUI operates independent of the application code, the application
+code operates independent of the GUI.</P>
+<H1>Python, Our Development Friend</H1>
+<P>The foundation of this approach is how to employ Python to help
+with development efforts.  Python is a friendly language, that is
+string based, and allows easy Client/Server interactions.  This paper
+has focused on string based operations.  This is key to utilization
+of Python to help us develop:</P>
+<UL>
+	<LI>A <B>Python Server</B> can easily be developed which responses
+	to string based inquiries from the GUI, via a socket.  Thus, with a
+	defined API, the GUI can be developed independent of the
+	application, using the defined string based API.  The GUI can be
+	developed under Windows or Linux; it doesn't matter.  It's core
+	functionality is to serve pages, and simply send requests, and
+	respond to those requests.
+	<LI>Python scripting serves as a test bed prior to full
+	implementation of target logic, allowing developers of the GUI to
+	send requests, get expected responses.
+	<LI>A series of Python scripts can be developed to “drive”
+	the application, either for development, or for regression testing. 
+	Envision several Python based tools:
+	<UL>
+	<LI>A command line interface to sequence the underlying core
+	logic of the application.
+	<LI>A series of scripts to perform regression testing, from an
+	automated build perspective; nightly pulled trees are built,
+	installed on the target, and then scripting run to test for valid
+	functionality.  Continuous integration.
+	<LI>From a day to day development perspective?  Scripting easily
+	developed to test various modes of operation of the product.
+	</UL>
+</UL>
+<P>An easily used language for rapid-prototype work, and gives
+simplistic approaches to developing both the GUI and application code
+independent of each other.</P>
+<H1>Summary</H1>
+<P>All products contain unique challenges on how they are developed
+and deployed.  This paper offers an approach that allows simultaneous
+development of a GUI and Application Code while working with the
+realities of daily life; multiple groups involved, hardware in flux,
+and integration always being the challenge for final deployment.</P>
+<P>It's
+core concept is design to debug, and design to have clean interfaces
+without the complicated bindings that prevent unit testing and clean
+deployment.  Often it is easier to develop a GUI under and Windows
+based host, without target hardware, while the application code is
+developed on the target hardware.</P>
+
+	</div>
+	<div id="footer">
+                <span id="copyright">All Material &#9400; 2016 - Thomas E. Besemer</span>
+		<ul>
+			<li><a href="index.html">Home</a></li>
+			<li><a href="yocto_base.html">Yocto</a></li>
+			<li><a href="buildroot_base.html">BuildRoot</a></li>
+			<li><a href="qt_base.html">QT/QML</a></li>
+			<li><a href="about.html">About</a></li>
+		</ul>
+	</div>
+</div>
+</body></html>
