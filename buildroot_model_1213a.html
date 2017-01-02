@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<HTML>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><title>YoctoWorks</title>
+
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+<div id="container">
+        <div id="header_navigation">
+                <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="yocto_base.html">Yocto</a></li>
+                        <li><a href="buildroot_base.html">BuildRoot</a></li>
+                        <li><a href="about.html">About</a></li>
+                </ul>
+        </div>
+
+        <div id="papercontent">
+
+<H1 CLASS="western">Basic Buildroot Model</H1>
+<P><I>Buildroot is a simple, efficient and easy-to-use tool to
+generate embedded Linux systems through cross-compilation</I>.  That
+phrase, taken from the Buildroot website, and provides exact
+explanation of what Buildroot is.  Buildroot also provides
+flexibility in how to manage embedded Linux systems.  Figure 1 shows
+three typical models.</P>
+<P><IMG SRC="images/buildroot_model_1213a_html_29277cfc.gif" ><BR><BR>
+</P>
+<P ALIGN=CENTER><FONT COLOR="#000000"><B>Figure 1 &#8210; Typical Buildroot Models</B></FONT></P>
+<P><FONT COLOR="#000000">Buildroot can be used several different
+ways.  Figure 1 shows three typical models:</FONT></P>
+<OL>
+	<LI><P><FONT COLOR="#000000"><B>Model 1:</B> All inclusive,
+	Buildroot generates the Root File System, the Linux Kernel, a U-Boot
+	image, and contains the cross-compilation tools</FONT></P>
+	<LI><P><FONT COLOR="#000000"><B>Model 2:</B> Identical to Model 1,
+	with the exception of the usage of external cross-compilation tools.</FONT></P>
+	<LI><P><FONT COLOR="#000000"><B>Model 3: </B>Buildroot is used to
+	build only the Root File System, while the Kernel and U-Boot are
+	built externally, using external cross-compilation tools.</FONT></P>
+</OL>
+<P><FONT COLOR="#000000">In these models, the user application code
+is built externally, and then final assembly is done by user supplied
+logic to generate images specific to the user needs.  Although it's
+possible to add user packages to Buildroot for generation within
+Buildroot itself, it's generally more practical to simply build the
+user appplication code with standard Makefiles using either a
+Buildroot internal set of cross-compilation tools, or external
+cross-compilation tools.</FONT></P>
+<P>
+</div>
+        <div id="footer">
+                <span id="copyright">All Material &#9400; 2016 - Thomas E. Besemer</span>
+                <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="yocto_base.html">Yocto</a></li>
+                        <li><a href="buildroot_base.html">BuildRoot</a></li>
+                        <li><a href="about.html">About</a></li>
+                </ul>
+        </div>
+</div>
+</BODY>
+</HTML>
