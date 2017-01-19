@@ -3,10 +3,10 @@
 <head>
 <title>YoctoWorks</title>
 <meta property="og:type" content="website" />
-<meta property="og:title" content="YoctoWorks - Resources for Embedded Systems"/>
+<meta property="og:title" content="Embedded Linux Deployment - Approaches"/>
 <meta property="og:image" content="http://www.yoctoworks.com/images/bay_bridge_li.jpg"/>
-<meta property="og:description" content="YoctoWorks is a consulting group that specializes in Embedded Systems.  Our website provides resources and guidelines for people developing Embedded Systems with Yocto and BuildRoot, and includes general tips for usage of Open Source packages and resources."/>
-<meta property="og:url" content="http://www.yoctoworks.com"/>
+<meta property="og:description" content="An article that provides a overview of the differences between BuildRoot and Yocto/OE, and outlines some practical approaches to development and deployment with either."/>
+<meta property="og:url" content="http://www.yoctoworks.com/linux_deployment_0118a.html"/>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -98,6 +98,10 @@ software development in a means that will survive a multi-year
 product cycle that easily incorporates into it the never ending
 changes in Open Source that surround them, but cannot be avoided in
 any way.</P>
+<P><B>Figure 1</B> depicts an approach that incorporates the primary components which are discussed in this article:</P>
+<p><img align=center; alt="Missing" src="images/os_env.gif" /><br />
+</p>
+<P ALIGN=CENTER><B>Figure 1 &#8210; Primary Approaches</B></P>
 <H1>Available Tools and Packages</H1>
 <P>Before discussing in detail approaches to managing an Embedded
 Linux project, let's take a look at some of the options for
@@ -121,20 +125,14 @@ MontaVista, NXP, Wind River, Intel and others over the past several
 years.</P>
 <P><I>Advantages:</I></P>
 <UL>
-	<LI><P STYLE="margin-bottom: 0in">Reasonable support from each
-	vendor.</P>
-	<LI><P STYLE="margin-bottom: 0in">Supports multi-platform,
-	multi-target environments natively.</P>
-	<LI><P STYLE="margin-bottom: 0in">Provides generation of an SDK to
-	build against the libraries and header files externally.</P>
+	<LI>Reasonable support from each vendor.
+	<LI>Supports multi-platform, multi-target environments natively.
+	<LI>Provides generation of an SDK to build against the libraries and header files externally.
 </UL>
 <P><I>Disadvantages:</I></P>
 <UL>
-	<LI><P STYLE="margin-bottom: 0in">Somewhat complicated at first
-	glance, and application code within the framework requires
-	development of BitBake recipes.</P>
-	<LI><P STYLE="margin-bottom: 0in">Slow build times without
-	high-performance, multi-core machines.</P>
+	<LI>Somewhat complicated at first glance, and application code within the framework requires development of BitBake recipes.
+	<LI>Slow build times without high-performance, multi-core machines.
 </UL>
 <H2>BuildRoot</H2>
 <P>A robust set of tools that have been used by many organizations
@@ -142,16 +140,13 @@ for years, and continues to be extremely viable.  However, generally
 not supported by vendors.</P>
 <P><I>Advantages:</I></P>
 <UL>
-	<LI><P STYLE="margin-bottom: 0in">Extremely quick spin-up curve.</P>
-	<LI><P STYLE="margin-bottom: 0in">Not commercialized by larger Open
-	Source Vendors.</P>
+	<LI>Extremely quick spin-up curve.
+	<LI>Not commercialized by all Open Source Vendors.
 </UL>
 <P><I>Disadvantages:</I></P>
 <UL>
-	<LI><P STYLE="margin-bottom: 0in">Limited support from processor
-	vendors such as TI, Intel and Freescale.</P>
-	<LI><P STYLE="margin-bottom: 0in">Does not easily support
-	multi-processor, multi-target environments.</P>
+	<LI>Limited support from processor vendors such as TI, Intel and Freescale.
+	<LI>Does not easily support multi-processor, multi-target environments.
 </UL>
 <H2>Cross Compilers and Tools</H2>
 <P>Tools like Open Embedded and BuildRoot do allow for a tool chain
@@ -211,11 +206,13 @@ detail on what matters:</P>
 	modification from any stock release from vendors or upstream feeds,
 	simply do to custom hardware, customer drivers and enhancements
 	around the networking stack.  Recommended approaches:</P>
+	<UL>
 	<LI><P>Establish the Kernel in GitHub, preserving branching and
 	revision history from the upstream feed.</P>
 	<LI><P>Modify changes as needed for company specific needs on a
 	company specific branch; this allows for easy patch set generation
 	and application when migrating to a newer version of the Kernel.</P>
+	</UL>
 	<LI><P><B>Boot Loader: </B> Typically U-Boot.  A general use-case
 	scenario is that it is made stable during board bring-up, and rarely
 	will change after that on a per-board basis.  As a “run once”
@@ -269,15 +266,15 @@ of these components come to together.  And, it's that scripting that
 allows us to work with the never ending changes from Open Source, as
 through this, the product developer maintains full control over what
 happens.</P>
-<P><B>Figure 1</B> depicts this structure:</P>
-<p><img style="width: 760px; height: 511px;" alt="Missing" src="images/mel_fig1.gif" /><br />
+<P><B>Figure 2</B> depicts this structure:</P>
+<p><img align=center; alt="Missing" src="images/mel_fig1.gif" /><br />
 </p>
-<P ALIGN=CENTER><B>Figure 1 &#8210; A Practical Implementation</B></P>
-<P>Breaking down what is in <B>Figure 1</B> is as follows:</P>
+<P ALIGN=CENTER><B>Figure 2 &#8210; A Practical Implementation</B></P>
+<P>Breaking down what is in <B>Figure 2</B> is as follows:</P>
 <OL>
 	<LI><P STYLE="margin-bottom: 0in"><B>Root FS Source: </B> This can
 	come from a variety of sources.  The application developer need not
-	be concerned, this is provided by an “OS Team”; over time, this
+	be concerned, this is provided by an <em>OS Team</em>; over time, this
 	will change, and there will be multiple sources for a Root FS, each
 	applied to a specific customer/product release environment.</P>
 	<LI><P STYLE="margin-bottom: 0in"><B>Kernel Source: </B>This can
