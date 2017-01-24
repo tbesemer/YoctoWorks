@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html prefix="og: http://ogp.me/ns#">
+<head>
+<title>YoctoWorks</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Embedded Linux Deployment - Approaches"/>
+<meta property="og:image" content="http://www.yoctoworks.com/images/pcb_image1_li.jpg"/>
+<meta property="og:description" content="An article that provides a overview of the differences between BuildRoot and Yocto/OE, and outlines some practical approaches to development and deployment with either."/>
+<meta property="og:url" content="http://www.yoctoworks.com/linux_deployment_0118a.html"/>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<meta name="Author" content="Thomas E. Besemer" />
+</head>
+
+<div id="container">
+	<div id="header_navigation">
+		<ul>
+			<li><a href="index.html">Home</a></li>
+			<li><a href="yocto_base.html">Yocto</a></li>
+			<li><a href="buildroot_base.html">BuildRoot</a></li>
+			<li><a href="qt_base.html">QT/QML</a></li>
+			<li><a href="about.html">About</a></li>
+		</ul>
+	</div>
+	<div id="papercontent">
+
+</HEAD>
+<H1 CLASS="western">Introduction</H1>
+<P>Manufacturing needs vary for any company.  For larger companies
+producing large quantities, the problem is often resolved through the
+use of organizations which specialize in high volume operations. 
+Smaller companies, or <em>first runs</em> of a product, often require
+localized, engineering centric manufacturing fixtures which can be
+utilized by floor personal who are not highly trained in engineering.
+ These fixtures are used to accomplish a variety of tasks, such as:</P>
+<UL>
+	<LI>Flashing soldered in devices such as eMMC or NAND/NOR Flash
+	with boot and/or production images.
+	<LI>Handling and diagnosing product that fails regular
+	manufacturing quality assurance and testing.
+	<LI>Performing diagnostic testing of new hardware, such as Power
+	On Self Tests, or Manufacturing Diagnostic Tests.
+	<LI>Production configuration and deployment of small batches.
+</UL>
+<P>Figure 1 shows an example fixture which helps automate all of
+these processes.</P>
+<p><img align=center; alt="Missing" src="images/small_scale_fig1.gif" /><br />
+</p>
+<P ALIGN=CENTER><B>Figure 1 &#8210; Manufacturing Test/Deployment Fixture</B></P>
+<P>The type configuration shown in Figure 1 is designed to be
+assembled by engineering staff, but simple enough to use by staff who
+are not as highly trained.  The key aspects of this test fixture are:</P>
+<OL>
+	<LI>A BDI-3000 JTAG Emulator is shown; although these are
+	currently end of life, they are still available from several
+	sources.  This simple tool allows interaction with the host
+	processor via a JTAG interface, allowing many operations to be done,
+	such as programming of flash and running of diagnostics.  And, there
+	are many alternatives to the BDI-3000 that may be better suited for
+	the processor in use.
+	<LI>A core Python set of classes for not only controlling the
+	BDI-3000, but for interfacing with a UART based console on the
+	target.  This set of classes provide primary sequencing and control
+	designed specifically for any operations which are required.
+	<LI>The host test fixture is Linux based, and this provides
+	NFS/TFTP services for the target, such as a NFS Root Filesystem, as
+	well as allowing boot of a Linux Kernel from U-Boot on the Target.
+	<LI>Connected Windows or Linux based clients to the host test
+	fixture are able to run extremely simple Python scripts which cause
+	various actions to happen, such as installing default images in
+	flash, or running diagnostics.  These scripts are kept extremely
+	simply, as the complex work is done by the core Python classes on
+	the test fixture.  Effectively, they can look like MS-DOS based
+	batch files, and floor personal can be easily trained to modify
+	and/or create simple control scripts.
+</OL>
+<H1 CLASS="western">Operational Flow</H1>
+<P>For the sake of discussion, two types of operational flow are
+discussed: First boot installation, and failed board diagnostics
+(RMA).</P>
+<H2 CLASS="western">First Boot Installation</H2>
+<P>In this case, it is assumed that the target hardware comes from
+the board house with blank flash.  This is often the case with NAND
+flash, which has specialized handling characteristics around it due
+to bad block management.  Other cases are where eMMC or NOR flash
+does have a pre-programed image in it, but often is way out of date. 
+A typical flow would be:</P>
+<OL>
+	<LI>Connect to test fixture, power up.
+	<LI>Execute a script on the client machine which as the simple
+	Python scripting, which invokes the more complex scripting on the
+	test fixture host to initiate flash programing through the BDI-3000.
+	 Typically, this would simply install U-Boot or Diagnostics (or a
+	version of U-Boot which contains Diagnostics).
+	<LI>After first installation, reboot and then run Diagnostics,
+	monitoring output and detecting pass/fail conditions.  These
+	diagnostics could emit messages on the console, or in more advanced
+	settings (not shown in Figure 1), several LED's could show state,
+	and these LED's, controlled by GPIO's, could also be connected
+	to the test fixture; the GPIO's could be brought out on a stick
+	header, and connected to a parallel port on the test fixture,
+	allowing the core Python classes to monitor state.
+	<LI>If the target passes Diagnostics, additional control
+	scripting could be used to cause U-Boot to load a Linux Kernel via
+	TFTP, mount a Root Filesystem NFS, and do final production flashing
+	and configuration using company specific upgrade/install logic.
+</OL>
+<P>Although this is a very simplified example, it does demonstrate
+how using base Python classes on the test fixture allow connected
+clients to cause complex operations with simple steps.</P>
+<H2 CLASS="western">Failed Board Diagnostics</H2>
+<P>Typically for drop-out from manufacturing, or for customer RMA,
+these operations are very similar to First Boot Installation: Simple
+control scripts on the connected client to execute complex commands
+via the test fixture, initiating a variety of diagnostics and
+monitoring the results.  Some examples:</P>
+<OL>
+	<LI>Run a full set of diagnostics from the BDI-3000; this allows
+	the diagnostics to run without any target firmware executing.  Thus,
+	if the NAND/NOR has failed, diagnostics can be run on it. The same
+	applies for SDRAM.
+	<LI>Run higher-level complex diagnostics, such as network tests.
+	<LI>Initiate POST which reside in U-Boot.
+	<LI>For high-speed network interfaces, it's often desired to
+	exercise low-level diagnostics at the PHY level, capturing data such
+	as Eye Diagrams.  A test fixture of this nature can greatly automate
+	this process.
+</OL>
+<H1 CLASS="western">Summary</H1>
+<P>Every target configuration, and development house, will have
+different needs.  Yet, these simple approaches can easily simplify
+day to day operations of designed in at engineering time.  As targets
+are brought-up and application code is developed, the test fixture
+becomes and extension to the Development Engineering Team, and they
+can create base Python control classes incrementally, classes which
+are then easily sequenced by very simple Python scripting on
+connected clients by technicians. 
+	</div>
+	<div id="footer">
+                <span id="copyright">All Material &#9400; 2017 - Thomas E. Besemer</span>
+		<ul>
+			<li><a href="index.html">Home</a></li>
+			<li><a href="yocto_base.html">Yocto</a></li>
+			<li><a href="buildroot_base.html">BuildRoot</a></li>
+			<li><a href="qt_base.html">QT/QML</a></li>
+			<li><a href="about.html">About</a></li>
+		</ul>
+	</div>
+</div>
+</body></html>
