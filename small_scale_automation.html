@@ -3,10 +3,10 @@
 <head>
 <title>YoctoWorks</title>
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Embedded Linux Deployment - Approaches"/>
-<meta property="og:image" content="http://www.yoctoworks.com/images/pcb_image1_li.jpg"/>
-<meta property="og:description" content="An article that provides a overview of the differences between BuildRoot and Yocto/OE, and outlines some practical approaches to development and deployment with either."/>
-<meta property="og:url" content="http://www.yoctoworks.com/linux_deployment_0118a.html"/>
+<meta property="og:title" content="Small Scale Production Automation - Approaches"/>
+<meta property="og:image" content="http://www.yoctoworks.com/images/small_scale1.jpg"/>
+<meta property="og:description" content="An article that provides an overview of some simple approaches to automation and diagnostics around small scale production runs of product through the usage of easily implemented Manufacturing Server."/>
+<meta property="og:url" content="http://www.yoctoworks.com/small_scale_automation.html"/>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -26,7 +26,7 @@
 	<div id="papercontent">
 
 </HEAD>
-<H1 CLASS="western">Introduction</H1>
+<H1 CLASS="western">Small Scale Production Automation</H1>
 <P>Manufacturing needs vary for any company.  For larger companies
 producing large quantities, the problem is often resolved through the
 use of organizations which specialize in high volume operations. 
@@ -87,7 +87,7 @@ to bad block management.  Other cases are where eMMC or NOR flash
 does have a pre-programed image in it, but often is way out of date. 
 A typical flow would be:</P>
 <OL>
-	<LI>Connect to test fixture, power up.
+	<LI>Connect to Manufacturing Fixture, power up.
 	<LI>Execute a script on the client machine which as the simple
 	Python scripting, which invokes the more complex scripting on the
 	test fixture host to initiate flash programing through the BDI-3000.
@@ -98,7 +98,7 @@ A typical flow would be:</P>
 	diagnostics could emit messages on the console, or in more advanced
 	settings (not shown in Figure 1), several LED's could show state,
 	and these LED's, controlled by GPIO's, could also be connected
-	to the test fixture; the GPIO's could be brought out on a stick
+	to the Manufacturing Fixture; the GPIO's could be brought out on a stick
 	header, and connected to a parallel port on the test fixture,
 	allowing the core Python classes to monitor state.
 	<LI>If the target passes Diagnostics, additional control
@@ -107,13 +107,13 @@ A typical flow would be:</P>
 	and configuration using company specific upgrade/install logic.
 </OL>
 <P>Although this is a very simplified example, it does demonstrate
-how using base Python classes on the test fixture allow connected
+how using base Python classes on the Manufacturing Fixture allow connected
 clients to cause complex operations with simple steps.</P>
 <H2 CLASS="western">Failed Board Diagnostics</H2>
 <P>Typically for drop-out from manufacturing, or for customer RMA,
 these operations are very similar to First Boot Installation: Simple
 control scripts on the connected client to execute complex commands
-via the test fixture, initiating a variety of diagnostics and
+via the Manufacturing Fixture, initiating a variety of diagnostics and
 monitoring the results.  Some examples:</P>
 <OL>
 	<LI>Run a full set of diagnostics from the BDI-3000; this allows
@@ -124,14 +124,14 @@ monitoring the results.  Some examples:</P>
 	<LI>Initiate POST which reside in U-Boot.
 	<LI>For high-speed network interfaces, it's often desired to
 	exercise low-level diagnostics at the PHY level, capturing data such
-	as Eye Diagrams.  A test fixture of this nature can greatly automate
+	as Eye Diagrams.  A Manufacturing Fixture of this nature can greatly automate
 	this process.
 </OL>
 <H1 CLASS="western">Summary</H1>
 <P>Every target configuration, and development house, will have
 different needs.  Yet, these simple approaches can easily simplify
 day to day operations of designed in at engineering time.  As targets
-are brought-up and application code is developed, the test fixture
+are brought-up and application code is developed, the Manufacturing Fixture
 becomes and extension to the Development Engineering Team, and they
 can create base Python control classes incrementally, classes which
 are then easily sequenced by very simple Python scripting on
